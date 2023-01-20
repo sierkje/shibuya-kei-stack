@@ -1,5 +1,5 @@
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node"
+import { json } from "@remix-run/node"
 import {
   Links,
   LiveReload,
@@ -7,29 +7,29 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
+} from "@remix-run/react"
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "./session.server";
-import { cssBundleHref } from "@remix-run/css-bundle";
+import tailwindStylesheetUrl from "./styles/tailwind.css"
+import { getUser } from "./session.server"
+import { cssBundleHref } from "@remix-run/css-bundle"
 
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: tailwindStylesheetUrl },
     ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-  ];
-};
+  ]
+}
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Remix Notes",
   viewport: "width=device-width,initial-scale=1",
-});
+})
 
 export async function loader({ request }: LoaderArgs) {
   return json({
     user: await getUser(request),
-  });
+  })
 }
 
 export default function App() {
@@ -46,5 +46,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  );
+  )
 }

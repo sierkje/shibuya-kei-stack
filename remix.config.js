@@ -7,4 +7,4 @@ module.exports = {
   future: {
     unstable_vanillaExtract: true,
   },
-};
+}

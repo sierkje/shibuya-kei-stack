@@ -1,47 +1,47 @@
-import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
-import * as React from "react";
+import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
+import { Form, Link, useActionData, useSearchParams } from "@remix-run/react"
+import * as React from "react"
 
-import { getUserId, createUserSession } from "~/session.server";
+import { getUserId, createUserSession } from "~/session.server"
 
-import { createUser, getUserByEmail } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
+import { createUser, getUserByEmail } from "~/models/user.server"
+import { safeRedirect, validateEmail } from "~/utils"
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserId(request);
-  if (userId) return redirect("/");
-  return json({});
+  const userId = await getUserId(request)
+  if (userId) return redirect("/")
+  return json({})
 }
 
 export async function action({ request }: ActionArgs) {
-  const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
+  const formData = await request.formData()
+  const email = formData.get("email")
+  const password = formData.get("password")
+  const redirectTo = safeRedirect(formData.get("redirectTo"), "/")
 
   if (!validateEmail(email)) {
     return json(
       { errors: { email: "Email is invalid", password: null } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json(
       { errors: { email: null, password: "Password is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (password.length < 8) {
     return json(
       { errors: { email: null, password: "Password is too short" } },
       { status: 400 }
-    );
+    )
   }
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmail(email)
   if (existingUser) {
     return json(
       {
@@ -51,39 +51,39 @@ export async function action({ request }: ActionArgs) {
         },
       },
       { status: 400 }
-    );
+    )
   }
 
-  const user = await createUser(email, password);
+  const user = await createUser(email, password)
 
   return createUserSession({
     request,
     userId: user.id,
     remember: false,
     redirectTo,
-  });
+  })
 }
 
 export const meta: MetaFunction = () => {
   return {
     title: "Sign Up",
-  };
-};
+  }
+}
 
 export default function Join() {
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? undefined;
-  const actionData = useActionData<typeof action>();
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get("redirectTo") ?? undefined
+  const actionData = useActionData<typeof action>()
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {
-      emailRef.current?.focus();
+      emailRef.current?.focus()
     } else if (actionData?.errors?.password) {
-      passwordRef.current?.focus();
+      passwordRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   return (
     <div className="flex min-h-full flex-col justify-center">
@@ -167,5 +167,5 @@ export default function Join() {
         </Form>
       </div>
     </div>
-  );
+  )
 }
